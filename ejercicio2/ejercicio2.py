@@ -88,7 +88,7 @@ def proteger_archivo_sensible(ruta):
     except PermissionError:
         # no tenemos permisos suficientes, lo dejamos pasar
         pass
-    
+
 # ------------------ Funciones AWS (S3 y RDS) ------------------ #
 
 def asegurar_bucket_y_subir(aws_region, bucket_name,
@@ -189,3 +189,99 @@ def asegurar_instancia_rds(aws_region, instancia_id, db_name, db_user, ruta_log)
         print(f"Error creando la instancia RDS: {e}")
         registrar_log(ruta_log, f"ERROR creando RDS {instancia_id}: {e}")
         raise
+    
+# ------------------ Función principal ------------------ #
+
+def main():
+    # 1) Leer configuración
+    ruta_config = "config_rrhh.env"
+    config = leer_config(ruta_config)
+
+    # Config local
+    base_dir = config.get("BASE_DIR", "./rrhh_app")
+    datos_dir_nombre = config.get("DATOS_DIR", "datos")
+    logs_dir_nombre = config.get("LOGS_DIR", "logs")
+    nombre_empleados = config.get("ARCHIVO_EMPLEADOS", "empleados.csv")
+    nombre_log = config.get("ARCHIVO_LOG", "deploy.log")
+    modo_demo = config.get("MODO_DEMO", "SI")
+
+    # Config AWS
+    habilitar_aws = config.get("HABILITAR_AWS", "NO").upper() == "SI"
+    aws_region = config.get("AWS_REGION", "")
+    s3_bucket = config.get("S3_BUCKET", "")
+    app_package = config.get("APP_PACKAGE", "app_rrhh.zip")
+    s3_app_key = config.get("S3_APP_KEY", "app/app_rrhh.zip")
+    s3_empleados_key = config.get("S3_EMPLEADOS_KEY", "data/empleados.csv")
+    rds_instancia_id = config.get("RDS_DB_INSTANCE_ID", "rrhh-mysql")
+    rds_db_name = config.get("RDS_DB_NAME", "rrhh")
+    rds_db_user = config.get("RDS_DB_USER", "admin")
+
+    # 2) Construir rutas locales
+    datos_dir = os.path.join(base_dir, datos_dir_nombre)
+    logs_dir = os.path.join(base_dir, logs_dir_nombre)
+    ruta_empleados = os.path.join(datos_dir, nombre_empleados)
+    ruta_log = os.path.join(logs_dir, nombre_log)
+
+    # 3) Crear estructura de directorios
+    asegurar_directorio(base_dir)
+    asegurar_directorio(datos_dir)
+    asegurar_directorio(logs_dir)
+
+    # 4) Registrar inicio en log
+    registrar_log(ruta_log, "Inicio de despliegue de aplicación RRHH (local + AWS opcional).")
+
+    # 5) Crear archivo de empleados (demo o vacío)
+    cant_registros = crear_archivo_empleados(ruta_empleados, modo_demo)
+    registrar_log(
+        ruta_log,
+        f"Archivo de empleados: {ruta_empleados}. Registros creados (demo): {cant_registros}"
+    )
+
+    # 6) Proteger archivo sensible
+    proteger_archivo_sensible(ruta_empleados)
+    registrar_log(ruta_log, f"Permisos 600 aplicados (si fue posible) sobre {ruta_empleados}")
+
+    # 7) Parte AWS
+    if habilitar_aws:
+        print("Se habilitó despliegue en AWS según configuración.")
+        registrar_log(ruta_log, "Despliegue AWS habilitado.")
+
+        try:
+            asegurar_bucket_y_subir(
+                aws_region=aws_region,
+                bucket_name=s3_bucket,
+                app_package_path=app_package,
+                s3_app_key=s3_app_key,
+                empleados_path=ruta_empleados,
+                s3_empleados_key=s3_empleados_key,
+                ruta_log=ruta_log,
+            )
+            asegurar_instancia_rds(
+                aws_region=aws_region,
+                instancia_id=rds_instancia_id,
+                db_name=rds_db_name,
+                db_user=rds_db_user,
+                ruta_log=ruta_log,
+            )
+        except Exception as e:
+            print(f"Error durante la parte AWS del despliegue: {e}")
+            registrar_log(ruta_log, f"ERROR en despliegue AWS: {e}")
+        else:
+            registrar_log(ruta_log, "Despliegue AWS completado correctamente.")
+    else:
+        registrar_log(ruta_log, "Despliegue AWS deshabilitado por configuración.")
+
+    # 8) Mensaje final al usuario (sin mostrar salarios)
+    print("Despliegue de aplicación RRHH completado (local).")
+    print(f"Directorio base: {os.path.abspath(base_dir)}")
+    print(f"Archivo de empleados: {os.path.abspath(ruta_empleados)}")
+    print(f"Cantidad de registros cargados (demo): {cant_registros}")
+    print(f"Log de despliegue: {os.path.abspath(ruta_log)}")
+    print("IMPORTANTE: los salarios y datos sensibles NO se muestran por pantalla.")
+
+    registrar_log(ruta_log, "Despliegue local completado correctamente.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
