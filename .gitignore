@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Entornos virtuales
+env/
+venv/
+.venv/
+
+# VSCode settings
+.vscode/
+
+# AWS credentials (muy importante para seguridad)
+.aws/
+credentials
+config
+
+# Archivos zip del proyecto
+*.zip
+
+# Logs
+*.log
+
+# Directorio generado por la app
+rrhh_app/
