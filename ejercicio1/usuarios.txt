@@ -1,0 +1,2 @@
+pepe:usuario de prueba:/home/pepe:SI:/bin/bash
+juan:cuenta común:/home/juan:NO:/bin/bash
