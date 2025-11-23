@@ -272,7 +272,7 @@ echo
 echo "Se han creado de manera exitosa $CREADOS usuarios"
 
 
----------------------------------------------------------------------------
+------------------------------------------------------------------------
 
 Uso del script
 
@@ -288,8 +288,34 @@ ejemplo:
 
 usuario:comentario:home:SI|NO:shell
 
-----------------------------------------------------------------------------
+------------------------------------------------------------------------
+
+El script utiliza códigos de salida específicos para identificar fallas:
+
+Código	Motivo	    Descripción
+10	    Parámetros	Cantidad incorrecta de parámetros
+11	    Parámetros	Falta contraseña tras -c
+12	    Parámetros	Modificador inválido
+13	    Archivo	    No se proporcionó archivo de entrada
+20	    Archivo	    El archivo no existe
+21	    Archivo	    El archivo no es regular
+22	    Archivo	    Sin permisos de lectura
+30	    Formato	    Cantidad incorrecta de campos
+31	    Formato	    Campo "SI/NO" inválido
+------------------------------------------------------------------------
+
+Ubicacion del script en el sistema:
+
+C:\Users\Marco Aurelio\Documents\devops\obligatorio-devops-2025\ejercicio1
+
+------------------------------------------------------------------------
 
 Ejemplo salida real de la ejecución.
 
+El script fue probado en una máquina virtual Centos 8.1, verificando su correcto funcionamiento.
+
 ![Salida real del script](ejercicio1/Salida_ejecucion.png)
+
+El script cumple con todos los requisitos solicitados: creación de usuarios, validación de parámetros, manejo de errores, modularidad y evidencia real de ejecución.
+La ejecución fue probada en un entorno Linux real, y los usuarios fueron creados correctamente siguiendo el formato establecido.
+------------------------------------------------------------------------
