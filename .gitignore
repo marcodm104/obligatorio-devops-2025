@@ -25,3 +25,5 @@ config
 
 # Directorio generado por la app
 rrhh_app/
+
+config_rrhh.env
