@@ -1,0 +1,38 @@
+[2025-11-25 13:25:18] Inicio de despliegue de aplicación RRHH (local + AWS opcional).
+[2025-11-25 13:25:18] Archivo de empleados: ./rrhh_app\datos\empleados.csv. Registros creados (demo): 3
+[2025-11-25 13:25:18] Permisos 600 aplicados (si fue posible) sobre ./rrhh_app\datos\empleados.csv
+[2025-11-25 13:25:18] Despliegue AWS deshabilitado por configuración.
+[2025-11-25 13:25:18] Despliegue local completado correctamente.
+[2025-11-25 13:45:07] Inicio de despliegue de aplicación RRHH (local + AWS opcional).
+[2025-11-25 13:45:07] Archivo de empleados: ./rrhh_app\datos\empleados.csv. Registros creados (demo): 0
+[2025-11-25 13:45:07] Permisos 600 aplicados (si fue posible) sobre ./rrhh_app\datos\empleados.csv
+[2025-11-25 13:45:07] Despliegue AWS habilitado.
+[2025-11-25 13:45:09] Bucket S3 marco-rrhh-devops-2025 creado.
+[2025-11-25 13:45:09] Subido paquete app a s3://marco-rrhh-devops-2025/app/app_rrhh.zip
+[2025-11-25 13:45:10] Subido empleados a s3://marco-rrhh-devops-2025/data/empleados.csv
+[2025-11-25 13:45:11] Creando instancia RDS rrhh-mysql...
+[2025-11-25 13:45:12] ERROR creando RDS rrhh-mysql: An error occurred (InvalidParameterValue) when calling the CreateDBInstance operation: The parameter MasterUserPassword is not a valid password. Only printable ASCII characters besides '/', '@', '"', ' ' may be used.
+[2025-11-25 13:45:12] ERROR en despliegue AWS: An error occurred (InvalidParameterValue) when calling the CreateDBInstance operation: The parameter MasterUserPassword is not a valid password. Only printable ASCII characters besides '/', '@', '"', ' ' may be used.
+[2025-11-25 13:45:12] Despliegue local completado correctamente.
+[2025-11-25 13:51:56] Inicio de despliegue de aplicación RRHH (local + AWS opcional).
+[2025-11-25 13:51:56] Archivo de empleados: ./rrhh_app\datos\empleados.csv. Registros creados (demo): 0
+[2025-11-25 13:51:56] Permisos 600 aplicados (si fue posible) sobre ./rrhh_app\datos\empleados.csv
+[2025-11-25 13:51:56] Despliegue AWS habilitado.
+[2025-11-25 13:51:59] Bucket S3 marco-rrhh-devops-2025 ya existía.
+[2025-11-25 13:51:59] Subido paquete app a s3://marco-rrhh-devops-2025/app/app_rrhh.zip
+[2025-11-25 13:51:59] Subido empleados a s3://marco-rrhh-devops-2025/data/empleados.csv
+[2025-11-25 13:52:00] Creando instancia RDS rrhh-mysql...
+[2025-11-25 13:52:04] Instancia RDS rrhh-mysql creada correctamente.
+[2025-11-25 13:52:04] Despliegue AWS completado correctamente.
+[2025-11-25 13:52:04] Despliegue local completado correctamente.
+[2025-11-25 16:11:09] Inicio de despliegue de aplicación RRHH (local + AWS opcional).
+[2025-11-25 16:11:09] Archivo de empleados: ./rrhh_app\datos\empleados.csv. Registros creados (demo): 0
+[2025-11-25 16:11:09] Permisos 600 aplicados (si fue posible) sobre ./rrhh_app\datos\empleados.csv
+[2025-11-25 16:11:09] Despliegue AWS habilitado.
+[2025-11-25 16:11:11] Bucket S3 marco-rrhh-devops-2025 creado.
+[2025-11-25 16:11:11] Subido paquete app a s3://marco-rrhh-devops-2025/app/app_rrhh.zip
+[2025-11-25 16:11:12] Subido empleados a s3://marco-rrhh-devops-2025/data/empleados.csv
+[2025-11-25 16:11:14] Creando instancia RDS rrhh-mysql...
+[2025-11-25 16:11:16] Instancia RDS rrhh-mysql creada correctamente.
+[2025-11-25 16:11:16] Despliegue AWS completado correctamente.
+[2025-11-25 16:11:16] Despliegue local completado correctamente.
