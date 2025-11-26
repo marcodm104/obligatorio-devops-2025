@@ -65,6 +65,53 @@ Debe ejecutarse en un entorno Linux con:
 
 ------------------------------------------------------------------------
 
+Uso del script
+
+ejecución del script:
+
+./ej1_crea_usuarios.sh [-i] [-c contraseña] archivo_usuarios
+
+Formato del archivo de entrada (usuarios.txt):
+
+Cada línea debe contener 5 campos, separados por “:”
+
+ejemplo:
+
+usuario:comentario:home:SI|NO:shell
+
+------------------------------------------------------------------------
+
+El script utiliza códigos de salida específicos para identificar fallas:
+
+Código	Motivo	    Descripción
+10	    Parámetros	Cantidad incorrecta de parámetros
+11	    Parámetros	Falta contraseña tras -c
+12	    Parámetros	Modificador inválido
+13	    Archivo	    No se proporcionó archivo de entrada
+20	    Archivo	    El archivo no existe
+21	    Archivo	    El archivo no es regular
+22	    Archivo	    Sin permisos de lectura
+30	    Formato	    Cantidad incorrecta de campos
+31	    Formato	    Campo "SI/NO" inválido
+------------------------------------------------------------------------
+
+Ubicacion del script en el sistema:
+
+C:\Users\Marco Aurelio\Documents\devops\obligatorio-devops-2025\ejercicio1
+
+------------------------------------------------------------------------
+
+Ejemplo salida real de la ejecución.
+
+El script fue probado en una máquina virtual Centos 8.1, verificando su correcto funcionamiento.
+
+![Salida real del script](ejercicio1/Salida_ejecucion.png)
+
+El script cumple con todos los requisitos solicitados: creación de usuarios, validación de parámetros, manejo de errores, modularidad y evidencia real de ejecución.
+La ejecución fue probada en un entorno Linux real, y los usuarios fueron creados correctamente siguiendo el formato establecido.
+
+---------------------------------------------------------------------------------
+
 Codigo ejercicio 1 (bash)
 
 #!/bin/bash
@@ -253,52 +300,6 @@ echo "Se han creado de manera exitosa $CREADOS usuarios"
 
 ------------------------------------------------------------------------
 
-Uso del script
-
-ejecución del script:
-
-./ej1_crea_usuarios.sh [-i] [-c contraseña] archivo_usuarios
-
-Formato del archivo de entrada (usuarios.txt):
-
-Cada línea debe contener 5 campos, separados por “:”
-
-ejemplo:
-
-usuario:comentario:home:SI|NO:shell
-
-------------------------------------------------------------------------
-
-El script utiliza códigos de salida específicos para identificar fallas:
-
-Código	Motivo	    Descripción
-10	    Parámetros	Cantidad incorrecta de parámetros
-11	    Parámetros	Falta contraseña tras -c
-12	    Parámetros	Modificador inválido
-13	    Archivo	    No se proporcionó archivo de entrada
-20	    Archivo	    El archivo no existe
-21	    Archivo	    El archivo no es regular
-22	    Archivo	    Sin permisos de lectura
-30	    Formato	    Cantidad incorrecta de campos
-31	    Formato	    Campo "SI/NO" inválido
-------------------------------------------------------------------------
-
-Ubicacion del script en el sistema:
-
-C:\Users\Marco Aurelio\Documents\devops\obligatorio-devops-2025\ejercicio1
-
-------------------------------------------------------------------------
-
-Ejemplo salida real de la ejecución.
-
-El script fue probado en una máquina virtual Centos 8.1, verificando su correcto funcionamiento.
-
-![Salida real del script](ejercicio1/Salida_ejecucion.png)
-
-El script cumple con todos los requisitos solicitados: creación de usuarios, validación de parámetros, manejo de errores, modularidad y evidencia real de ejecución.
-La ejecución fue probada en un entorno Linux real, y los usuarios fueron creados correctamente siguiendo el formato establecido.
-------------------------------------------------------------------------
-
 Requisitos / Dependencias
 
 Ejercicio 2 (Python + AWS)
@@ -387,6 +388,7 @@ Ejecutar:
 
 python3 ejercicio2.py
 
+-----------------------------------------------------------------------------
 
 El script realizará:
 
@@ -398,7 +400,102 @@ Subida del archivo empleados.csv.
 
 Creación de una instancia RDS MySQL segura.
 
+----------------------------------------------------------------------------------
+
+Evidencia de ejecución real del script
+
+Ejecución del script en powershell configurado con aws cli
+
+Ejecución con AWS habilitado:
+
+![Ejecución con AWS](Docs/img/ejecucion_powershell_aws.png)
+
+Se observa:
+
+- Confirmación de que el bucket ya existe.
+
+- Subida de app_rrhh.zip.
+
+- Subida de empleados.csv.
+
+- Creación de la instancia RDS rrhh-mysql.
+
+- Mensaje final indicando que el despliegue local fue completado.
+
+Ejecución Local:
+
+En este caso:
+
+- No se realizan acciones en AWS.
+
+- Se crea la estructura local.
+
+- Se indica la cantidad de registros demo creados.
+
+- Se muestra la ubicación del log de despliegue.
+
+![Ejecución sin AWS](Docs/img/ejecucion_powershell_local.png)
+
+Listado de bases de datos en AWS RDS:
+
+![Instancia RDS creada](Docs/img/rds_instancia.png)
+
+se observa la instancia rrhh-mysql en estado Disponible, motor MySQL y clase db.t3.micro.
+
+Detalle de conectividad y seguridad de la instancia RDS:
+
+![Detalle instancia RDS](Docs/img/rds_instancia.png)
+
+Detalle de la instancia: endpoint, puerto, VPC, subredes y grupo de seguridad asociados.
+
+Bucket S3 creado:
+
+![Bucket creado](Docs/img/s3_bucket.png)
+
+Estructura del bucket app/ y data/:
+
+El bucket contiene dos carpetas principales:
+
+app/ para el paquete de la aplicación
+data/ para el archivo de empleados
+
+![Estructura del bucket](Docs/img/s3_bucket_estructura.png)
+
+Paquete de la app subido a S3:
+
+Dentro de la carpeta app/ se encuentra el archivo app_rrhh.zip subido por el script
+
+![app_rrhh.zip en S3](Docs/img/s3_app_carpeta.png)
+
+Archivo empleados.csv subido a S3:
+
+Dentro de la carpeta data/ se encuentra el archivo empleados.csv con los datos generados
+
+![empleados.csv en S3](Docs/img/s3_data_carpeta.png)
 ----------------------------------------------------------------------
+Ubicacion del script en el sistema:
+
+C:\Users\Marco Aurelio\Documents\devops\obligatorio-devops-2025\ejercicio2
+
+-----------------------------------------------------------------------
+
+El script desarrollado cumple con todos los requisitos:
+
+Automatiza el despliegue de una aplicación.
+
+Maneja datos sensibles de forma segura.
+
+Utiliza variables de entorno para credenciales.
+
+Evita exposición de claves en el repositorio.
+
+Lee configuración 100% desde archivo externo.
+
+Puede operar en modo local o modo AWS.
+
+Es totalmente trazable mediante GitHub (commits, ramas, documentación).
+
+-------------------------------------------------------------------------
 
 Codigo ejercicio 2
 
@@ -691,24 +788,5 @@ if __name__ == "__main__":
     raise SystemExit(main())
 
 ----------------------------------------------------------------------
-Ubicacion del script en el sistema:
 
-C:\Users\Marco Aurelio\Documents\devops\obligatorio-devops-2025\ejercicio2
 
------------------------------------------------------------------------
-
-El script desarrollado cumple con todos los requisitos:
-
-Automatiza el despliegue de una aplicación.
-
-Maneja datos sensibles de forma segura.
-
-Utiliza variables de entorno para credenciales.
-
-Evita exposición de claves en el repositorio.
-
-Lee configuración 100% desde archivo externo.
-
-Puede operar en modo local o modo AWS.
-
-Es totalmente trazable mediante GitHub (commits, ramas, documentación).
