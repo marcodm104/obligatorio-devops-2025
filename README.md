@@ -36,21 +36,38 @@ Trazabilidad mediante GitHub
 
 Estructura del repositorio:
 
+```bash
 obligatorio-devops-2025/
-│
 ├── ejercicio1/
 │   ├── ej1_crea_usuarios.sh
-│   └── usuarios.txt
+│   ├── usuarios.txt
+│   └── Salida_ejecucion.png
 │
 ├── ejercicio2/
 │   ├── ejercicio2.py
-│   ├── config_rrhh.env
-│   ├── empleados.csv
-│   ├── app.py
-│   ├── app_rrhh.zip
+│   ├── config_rrhh.env.ejemplo
+│   ├── rrhh_app/
+│   │   ├── datos/
+│   │   │   └── empleados.csv
+│   │   └── logs/
+│   │       └── deploy.log
+│   └── .gitkeep
+│
+├── Docs/
+│   └── img/
+│       ├── ejecucion_powershell_local.png
+│       ├── ejecucion_powershell_aws.png
+│       ├── rds_detalle.png
+│       ├── rds_instancia.png
+│       ├── s3_app_carpeta.png
+│       ├── s3_bucket.png
+│       ├── s3_bucket_estructura.png
+│       └── s3_data_carpeta.png
 │
 ├── .gitignore
-└── README.md        
+└── README.md
+     
+```
 
 Link del repositorio: https://github.com/marcodm104/obligatorio-devops-2025
 
@@ -83,16 +100,18 @@ usuario:comentario:home:SI|NO:shell
 
 El script utiliza códigos de salida específicos para identificar fallas:
 
-Código	Motivo	    Descripción
-10	    Parámetros	Cantidad incorrecta de parámetros
-11	    Parámetros	Falta contraseña tras -c
-12	    Parámetros	Modificador inválido
-13	    Archivo	    No se proporcionó archivo de entrada
-20	    Archivo	    El archivo no existe
-21	    Archivo	    El archivo no es regular
-22	    Archivo	    Sin permisos de lectura
-30	    Formato	    Cantidad incorrecta de campos
-31	    Formato	    Campo "SI/NO" inválido
+| Código | Motivo     | Descripción                               |
+|--------|------------|--------------------------------------------|
+| 10     | Parámetros | Cantidad incorrecta de parámetros          |
+| 11     | Parámetros | Falta contraseña tras -c                   |
+| 12     | Parámetros | Modificador inválido                       |
+| 13     | Archivo    | No se proporcionó archivo de entrada       |
+| 20     | Archivo    | El archivo no existe                       |
+| 21     | Archivo    | El archivo no es regular                   |
+| 22     | Archivo    | Sin permisos de lectura                    |
+| 30     | Formato    | Cantidad incorrecta de campos              |
+| 31     | Formato    | Campo "SI/NO" inválido                     |
+
 ------------------------------------------------------------------------
 
 Ubicacion del script en el sistema:
@@ -111,7 +130,7 @@ El script cumple con todos los requisitos solicitados: creación de usuarios, va
 La ejecución fue probada en un entorno Linux real, y los usuarios fueron creados correctamente siguiendo el formato establecido.
 
 ---------------------------------------------------------------------------------
-
+```bash
 Codigo ejercicio 1 (bash)
 
 #!/bin/bash
@@ -296,7 +315,7 @@ done < "$ARCHIVO"
 
 echo
 echo "Se han creado de manera exitosa $CREADOS usuarios"
-
+```
 
 ------------------------------------------------------------------------
 
@@ -496,7 +515,7 @@ Puede operar en modo local o modo AWS.
 Es totalmente trazable mediante GitHub (commits, ramas, documentación).
 
 -------------------------------------------------------------------------
-
+```python
 Codigo ejercicio 2
 
 #!/usr/bin/env python3
@@ -786,7 +805,7 @@ def main():
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
+```
 ----------------------------------------------------------------------
 
 
