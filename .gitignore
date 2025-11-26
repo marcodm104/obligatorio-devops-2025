@@ -17,13 +17,5 @@ venv/
 credentials
 config
 
-# Archivos zip del proyecto
-*.zip
-
-# Logs
-*.log
-
-# Directorio generado por la app
-rrhh_app/
-
-config_rrhh.env
+# Ignorar archivo sensible de configuración
+**/config_rrhh.env
