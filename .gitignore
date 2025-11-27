@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Entornos virtuales
+env/
+venv/
+.venv/
+
+# VSCode settings
+.vscode/
+
+# AWS credentials (muy importante para seguridad)
+.aws/
+credentials
+config
+
+# Ignorar archivo sensible de configuración
+**/config_rrhh.env
