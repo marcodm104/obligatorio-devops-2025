@@ -126,9 +126,6 @@ El script fue probado en una máquina virtual Centos 8.1, verificando su correct
 
 ![Salida real del script](ejercicio1/Salida_ejecucion.png)
 
-El script cumple con todos los requisitos solicitados: creación de usuarios, validación de parámetros, manejo de errores, modularidad y evidencia real de ejecución.
-La ejecución fue probada en un entorno Linux real, y los usuarios fueron creados correctamente siguiendo el formato establecido.
-
 ---------------------------------------------------------------------------------
 ```bash
 Codigo ejercicio 1 (bash)
@@ -316,6 +313,10 @@ done < "$ARCHIVO"
 echo
 echo "Se han creado de manera exitosa $CREADOS usuarios"
 ```
+--------------------------------------------------------------------------
+
+El script cumple con todos los requisitos solicitados: creación de usuarios, validación de parámetros, manejo de errores, modularidad y evidencia real de ejecución.
+La ejecución fue probada en un entorno Linux real, y los usuarios fueron creados correctamente siguiendo el formato establecido.
 
 ------------------------------------------------------------------------
 
@@ -336,7 +337,7 @@ Se requiere una cuenta AWS Academy con permisos sobre:
 
 Archivo de configuración obligatorio
 
-El script utiliza un archivo externo llamado: config_rrhh.env
+El script lee todos los parámetros desde el archivo externo config_rrhh.env (nombre de bucket, región, modo demo, habilitación de AWS, etc.)
 ```bash
 BASE_DIR=./rrhh_app
 DATOS_DIR=datos
@@ -356,6 +357,10 @@ RDS_DB_INSTANCE_ID=rrhh-mysql
 RDS_DB_NAME=rrhh
 RDS_DB_USER=admin
 ```
+Este archivo no se versiona por seguridad. En su lugar se incluye config_rrhh.env.ejemplo.
+
+Para ejecutar el script en otra máquina, se debe copiar el archivo de ejemplo y luego ajustar los valores necesarios (bucket, región, etc.).
+
 Este archivo nos permite:
 
 - Modificar rutas sin tocar el código.
@@ -383,25 +388,23 @@ python3 ejercicio2.py
 
 Esto realiza:
 
-Creación de directorios
+- Creación de directorios
 
-Creación de empleados.csv
+- Creación de empleados.csv
 
-Creación de deploy.log
+- Creación de deploy.log
 
-Aplicación de permisos 600 al archivo sensible
+- Aplicación de permisos 600 al archivo sensible
 
-Si lo queremos ejecutar con AWS habilitado
+Si lo queremos ejecutar con AWS habilitado:
 
-Editar config_rrhh.env:
+- Editar config_rrhh.env
 
-HABILITAR_AWS=SI
-
+- HABILITAR_AWS=SI
 
 Exportar la contraseña de RDS:
 
-export RDS_ADMIN_PASSWORD="ContraseñaDificil123!"
-
+- export RDS_ADMIN_PASSWORD="ContraseñaDificil123!"
 
 Ejecutar:
 
@@ -463,7 +466,7 @@ se observa la instancia rrhh-mysql en estado Disponible, motor MySQL y clase db.
 
 Detalle de conectividad y seguridad de la instancia RDS:
 
-![Detalle instancia RDS](Docs/img/rds_instancia.png)
+![Detalle instancia RDS](Docs/img/rds_detalle.png)
 
 Detalle de la instancia: endpoint, puerto, VPC, subredes y grupo de seguridad asociados.
 
@@ -471,7 +474,7 @@ Bucket S3 creado:
 
 ![Bucket creado](Docs/img/s3_bucket.png)
 
-Estructura del bucket app/ y data/:
+Estructura del bucket app/ y data/
 
 El bucket contiene dos carpetas principales:
 
@@ -495,24 +498,6 @@ Dentro de la carpeta data/ se encuentra el archivo empleados.csv con los datos g
 Ubicacion del script en el sistema:
 
 C:\Users\Marco Aurelio\Documents\devops\obligatorio-devops-2025\ejercicio2
-
------------------------------------------------------------------------
-
-El script desarrollado cumple con todos los requisitos:
-
-Automatiza el despliegue de una aplicación.
-
-Maneja datos sensibles de forma segura.
-
-Utiliza variables de entorno para credenciales.
-
-Evita exposición de claves en el repositorio.
-
-Lee configuración 100% desde archivo externo.
-
-Puede operar en modo local o modo AWS.
-
-Es totalmente trazable mediante GitHub (commits, ramas, documentación).
 
 -------------------------------------------------------------------------
 ```python
@@ -808,4 +793,18 @@ if __name__ == "__main__":
 ```
 ----------------------------------------------------------------------
 
+El script desarrollado cumple con todos los requisitos:
 
+Automatiza el despliegue de una aplicación.
+
+Maneja datos sensibles de forma segura.
+
+Utiliza variables de entorno para credenciales.
+
+Evita exposición de claves en el repositorio.
+
+Lee configuración 100% desde archivo externo.
+
+Puede operar en modo local o modo AWS.
+
+Es totalmente trazable mediante GitHub (commits, ramas, documentación).
