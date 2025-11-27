@@ -366,9 +366,9 @@ Este archivo nos permite:
 
 - Modificar rutas sin tocar el código.
 
--Asignar nombre al bucket
+- Asignar nombre al bucket
 
--Nombre y usuario de la instancia RDS
+- Nombre y usuario de la instancia RDS
 
 - Activar o desactivar AWS con:
   HABILITAR_AWS=SI o HABILITAR_AWS=NO.
