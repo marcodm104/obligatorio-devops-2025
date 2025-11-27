@@ -127,8 +127,10 @@ El script fue probado en una máquina virtual Centos 8.1, verificando su correct
 ![Salida real del script](ejercicio1/Salida_ejecucion.png)
 
 ---------------------------------------------------------------------------------
-```bash
+
 Codigo ejercicio 1 (bash)
+
+```bash
 
 #!/bin/bash
 
@@ -313,7 +315,6 @@ done < "$ARCHIVO"
 echo
 echo "Se han creado de manera exitosa $CREADOS usuarios"
 ```
---------------------------------------------------------------------------
 
 El script cumple con todos los requisitos solicitados: creación de usuarios, validación de parámetros, manejo de errores, modularidad y evidencia real de ejecución.
 La ejecución fue probada en un entorno Linux real, y los usuarios fueron creados correctamente siguiendo el formato establecido.
@@ -337,7 +338,7 @@ Se requiere una cuenta AWS Academy con permisos sobre:
 
 Archivo de configuración obligatorio
 
-El script lee todos los parámetros desde el archivo externo config_rrhh.env (nombre de bucket, región, modo demo, habilitación de AWS, etc.)
+El script lee todos los parámetros desde el archivo externo config_rrhh.env (nombre de bucket, región, Instancia RDS, habilitación de AWS, etc.)
 ```bash
 BASE_DIR=./rrhh_app
 DATOS_DIR=datos
@@ -351,7 +352,7 @@ AWS_REGION=us-east-1
 S3_BUCKET=mi-bucket-devops
 APP_PACKAGE=ejercicio2/app_rrhh.zip
 S3_APP_KEY=app/app_rrhh.zip
-S2_EMPLEADOS_KEY=data/empleados.csv
+S3_EMPLEADOS_KEY=data/empleados.csv
 
 RDS_DB_INSTANCE_ID=rrhh-mysql
 RDS_DB_NAME=rrhh
@@ -364,6 +365,10 @@ Para ejecutar el script en otra máquina, se debe copiar el archivo de ejemplo y
 Este archivo nos permite:
 
 - Modificar rutas sin tocar el código.
+
+-Asignar nombre al bucket
+
+-Nombre y usuario de la instancia RDS
 
 - Activar o desactivar AWS con:
   HABILITAR_AWS=SI o HABILITAR_AWS=NO.
@@ -409,8 +414,6 @@ Exportar la contraseña de RDS:
 Ejecutar:
 
 python3 ejercicio2.py
-
------------------------------------------------------------------------------
 
 El script realizará:
 
