@@ -100,7 +100,7 @@ usuario:comentario:home:SI|NO:shell
 
 El script utiliza códigos de salida específicos para identificar fallas:
 
-| Código | Motivo     | Descripción                               |
+| Código | Motivo     | Descripción                                |
 |--------|------------|--------------------------------------------|
 | 10     | Parámetros | Cantidad incorrecta de parámetros          |
 | 11     | Parámetros | Falta contraseña tras -c                   |
@@ -337,7 +337,7 @@ Se requiere una cuenta AWS Academy con permisos sobre:
 Archivo de configuración obligatorio
 
 El script utiliza un archivo externo llamado: config_rrhh.env
-
+```bash
 BASE_DIR=./rrhh_app
 DATOS_DIR=datos
 LOGS_DIR=logs
@@ -355,7 +355,7 @@ S2_EMPLEADOS_KEY=data/empleados.csv
 RDS_DB_INSTANCE_ID=rrhh-mysql
 RDS_DB_NAME=rrhh
 RDS_DB_USER=admin
-
+```
 Este archivo nos permite:
 
 - Modificar rutas sin tocar el código.
