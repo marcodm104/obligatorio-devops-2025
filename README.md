@@ -39,9 +39,11 @@ Estructura del repositorio:
 ```bash
 obligatorio-devops-2025/
 ├── ejercicio1/
+│   ├── Docs/
+│   │   ├── Salida_ejecucion.png 
+│   │   └── salida_ejecucion_ambos_modificadores.png  
 │   ├── ej1_crea_usuarios.sh
 │   ├── usuarios.txt
-│   └── Salida_ejecucion.png
 │
 ├── ejercicio2/
 │   ├── ejercicio2.py
@@ -66,6 +68,7 @@ obligatorio-devops-2025/
 │
 ├── .gitignore
 └── README.md
+
      
 ```
 
