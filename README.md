@@ -124,7 +124,13 @@ Ejemplo salida real de la ejecución.
 
 El script fue probado en una máquina virtual Centos 8.1, verificando su correcto funcionamiento.
 
-![Salida real del script](ejercicio1/Salida_ejecucion.png)
+Prueba con modificador -i:
+
+![Salida real del script](ejercicio1/Docs/Salida_ejecucion.png)
+
+Prueba utilizando ambos modificadores y asignando contraseña (-i y -c)
+
+![Salida real del script](ejercicio1/Docs/salida_ejecucion_ambos_modificadores.png)
 
 ---------------------------------------------------------------------------------
 
