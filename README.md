@@ -74,6 +74,20 @@ obligatorio-devops-2025/
 
 Link del repositorio: https://github.com/marcodm104/obligatorio-devops-2025
 
+Gestión del repositorio y uso de ramas:
+
+main: rama principal con la versión final y estable del proyecto
+
+ej2-python: usada para desarrollar y probar el Ejercicio 2 sin afectar la rama principal.
+
+documentacion: destinada a la elaboración del README, incorporación de imágenes y ajustes finales.
+
+Cada rama se desarrolló de forma independiente y, una vez que los cambios estaban completos, se integraron en main mediante merges directos, resolviendo los conflictos que surgieron durante el proceso.
+Este flujo permitió trabajar de forma ordenada y mantener control sobre cada parte del proyecto.
+
+Cuando todos los cambios quedaron unificados y verificados, las ramas de trabajo fueron eliminadas para dejar el repositorio limpio y con una única versión final.
+El historial de commits y merges permanece disponible como evidencia del proceso de desarrollo y del uso de buenas prácticas de control de versiones.
+
 Requisitos / Dependencias
 
 Ejercicio 1 (Bash)
