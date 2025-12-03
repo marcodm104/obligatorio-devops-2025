@@ -25,69 +25,70 @@ Incluye:
 -	Sincronización de archivos desde S3, configuración del archivo .env y carga    opcional del script SQL inicial.
 -	Protección de credenciales mediante inputs y permisos seguros en la instancia.
 
-
-Estructura del repositorio:
-
-```bash
-
-obligatorio-devops-2025/
-├── ejercicio1/
-│   ├── Docs/
-│   │   ├── Salida_ejecucion.png
-│   │   └── salida_ejecucion_ambos_modificadores.png
-│   ├── ej1_crea_usuarios.sh
-│   └── usuarios.txt
-│
-├── ejercicio2/
-│   ├── ejercicio2.py
-│   └── ArchivosWeb/
-│
-├── .gitignore
-└── README.md
-
-     
-```
-
-Link del repositorio: https://github.com/marcodm104/obligatorio-devops-2025
-
-Gestión del repositorio y uso de ramas:
-
-main: rama principal con la versión final y estable del proyecto
-
-ej2-python: usada para desarrollar y probar el Ejercicio 2 sin afectar la rama principal.
-
-documentacion: destinada a la elaboración del README, incorporación de imágenes y ajustes finales.
-
-Cada rama se desarrolló de forma independiente y, una vez que los cambios estaban completos, se integraron en main mediante merges directos, resolviendo los conflictos que surgieron durante el proceso.
-Este flujo permitió trabajar de forma ordenada y mantener control sobre cada parte del proyecto.
-
-Cuando todos los cambios quedaron unificados y verificados, las ramas de trabajo fueron eliminadas para dejar el repositorio limpio y con una única versión final.
-El historial de commits y merges permanece disponible como evidencia del proceso de desarrollo y del uso de buenas prácticas de control de versiones.
-
-Requisitos / Dependencias
+Requisitos y Modo de uso
 
 Ejercicio 1 (Bash)
 
 Debe ejecutarse en un entorno Linux con:
 - bash 4.x o superior
-- permisos para crear usuarios
-- archivo de entrada con formato: nombre:comentario:/home/directorio:SI|NO
 
-------------------------------------------------------------------------
+Para crear o modificar usuarios en el sistema, es obligatorio ejecutar el script con privilegios de superusuario:
+```bash
+sudo ./ej1_crea_usuarios.sh
+``` 
 
-Uso del script
+Si se ejecuta sin sudo, los comandos useradd y chpasswd fallarán.
 
-ejecución del script:
+El archivo de usuarios debe contener una línea por usuario, con 5 campos separados por ":", respetando este formato:
 
+usuario:comentario:home:crear_home:shell
+
+Requisitos del archivo:
+
+- Debe existir
+
+- Debe ser un archivo regular (-f)
+
+- Debe ser legible (-r)
+
+- Debe tener exactamente 4 “:” por línea
+
+Herramientas del sistema necesarias:
+
+El script utiliza los siguientes comandos disponibles por defecto en Linux:
+
+- useradd → para crear usuarios
+
+- chpasswd → para asignar contraseñas cuando se usa el modificador -c
+
+- echo, wc, tr, set, etc.
+
+En caso de que falten, instalarlos con:
+```bash
+sudo apt install passwd   # Debian/Ubuntu
+sudo yum install shadow-utils   # CentOS/RHEL
+```
+
+Ejecución del script
+
+Antes de ejecutar, asegurarse de otorgar permisos:
+```bash
+chmod +x ej1_crea_usuarios.sh
+```
+```bash
 ./ej1_crea_usuarios.sh [-i] [-c contraseña] archivo_usuarios
+```
 
 Formato del archivo de entrada (usuarios.txt):
 
 Cada línea debe contener 5 campos, separados por “:”
 
 ejemplo:
-
+```bash
 usuario:comentario:home:SI|NO:shell
+```
+
+
 
 ------------------------------------------------------------------------
 
@@ -106,26 +107,6 @@ El script utiliza códigos de salida específicos para identificar fallas:
 | 31     | Formato    | Campo "SI/NO" inválido                     |
 
 ------------------------------------------------------------------------
-
-Ubicacion del script en el sistema:
-
-C:\Users\Marco Aurelio\Documents\devops\obligatorio-devops-2025\ejercicio1
-
-------------------------------------------------------------------------
-
-Ejemplo salida real de la ejecución.
-
-El script fue probado en una máquina virtual Centos 8.1, verificando su correcto funcionamiento.
-
-Prueba con modificador -i:
-
-![Salida real del script](ejercicio1/Docs/Salida_ejecucion.png)
-
-Prueba utilizando ambos modificadores y asignando contraseña (-i y -c)
-
-![Salida real del script](ejercicio1/Docs/salida_ejecucion_ambos_modificadores.png)
-
----------------------------------------------------------------------------------
 
 
 Requisitos / Dependencias
