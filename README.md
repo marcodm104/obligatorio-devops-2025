@@ -1,4 +1,4 @@
-Este archivo contiene la solución completa del Obligatorio de Programación para DevOps 2025, compuesto por:
+Este repositorio reúne los archivos y scripts desarrollados para el obligatorio de la materia Porgamacion para DevOps, correspondientes a los dos ejercicios solicitados en la consigna oficial compuesto por:
 
 Ejercicio 1 (Bash):
 Script que automatiza la creación de usuarios en Linux a partir de un archivo de entrada, aplicando verificaciones, manejo de errores y opciones adicionales de ejecución.
@@ -24,6 +24,11 @@ Incluye:
 -	Lanzamiento de una instancia EC2 con instalación automática de Apache y PHP.
 -	Sincronización de archivos desde S3, configuración del archivo .env y carga    opcional del script SQL inicial.
 -	Protección de credenciales mediante inputs y permisos seguros en la instancia.
+
+
+Este README ofrece una descripción general, los requisitos y las instrucciones de uso
+
+La documentación completa, junto con el análisis detallado, ejemplos de ejecución y referencias, se encuentra incluida en el informe en PDF.
 
 Requisitos y Modo de uso
 
