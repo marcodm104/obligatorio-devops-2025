@@ -322,180 +322,42 @@ La ejecución fue probada en un entorno Linux real, y los usuarios fueron creado
 
 Requisitos / Dependencias
 
-Ejercicio 2 (Python + AWS)
-Requiere:
-- Python 3.8+
-- Librerías instaladas:
-boto3
-botocore
+Para que el script pueda ejecutarse sin problemas, es necesario contar con un entorno previamente configurado tanto a nivel local como en la plataforma de AWS.
+En el equipo donde se ejecute el programa se debe disponer de Python 3 y de las librerías necesarias para interactuar con los servicios de la nube. En particular, se utilizan los módulos boto3 y botocore, que permiten crear, administrar y consultar recursos de AWS directamente desde el código. Ambos paquetes pueden instalarse mediante:
 
-Se requiere una cuenta AWS Academy con permisos sobre:
+pip install boto3 botocore
 
-- Amazon S3
+Además del entorno de Python, se requiere que la AWS CLI esté instalada y correctamente configurada con un usuario que cuente con permisos suficientes para aprovisionar infraestructura. Las credenciales asociadas deben habilitar acciones sobre los servicios utilizados en el despliegue, tales como Amazon S3, EC2 y RDS. Sin estas políticas, el script no podrá crear ni modificar los recursos necesarios.
 
-- Amazon RDS (MySQL)
+También es indispensable contar con la carpeta local que contiene los archivos de la aplicación web, la cual el script sincroniza automáticamente hacia el bucket de S3. Dichos archivos deben ubicarse dentro del directorio ArchivosWeb, manteniendo la estructura prevista para que el servidor web pueda procesarlos correctamente.
 
-Archivo de configuración obligatorio
+En conjunto, estas dependencias, tanto de software como de configuración en AWS garantizan que el script pueda ejecutar todas las etapas del despliegue de forma segura, automatizada y sin errores.
 
-El script lee todos los parámetros desde el archivo externo config_rrhh.env (nombre de bucket, región, Instancia RDS, habilitación de AWS, etc.)
-```bash
-BASE_DIR=./rrhh_app
-DATOS_DIR=datos
-LOGS_DIR=logs
-ARCHIVO_EMPLEADOS=empleados.csv
-ARCHIVO_LOG=deploy.log
-MODO_DEMO=SI
+----------------------------------------------------------------------
+Modo de uso y ejemplo de ejecucion
 
-HABILITAR_AWS=NO
-AWS_REGION=us-east-1
-S3_BUCKET=mi-bucket-devops
-APP_PACKAGE=ejercicio2/app_rrhh.zip
-S3_APP_KEY=app/app_rrhh.zip
-S3_EMPLEADOS_KEY=data/empleados.csv
+Para ejecutar el script hay que ubicarse en el directorio donde se encuentra el archivo del ejercicio y ejecutar en la terminal:
 
-RDS_DB_INSTANCE_ID=rrhh-mysql
-RDS_DB_NAME=rrhh
-RDS_DB_USER=admin
-```
-Este archivo no se versiona por seguridad. En su lugar se incluye config_rrhh.env.ejemplo.
+Python ej2.py
 
-Para ejecutar el script en otra máquina, se debe copiar el archivo de ejemplo y luego ajustar los valores necesarios (bucket, región, etc.).
+![Ejemplo ejecucion script](ejercicio2/ejemplo-ejecucion.jpeg)
 
-Este archivo nos permite:
+Una vez ejecutado hay que asignar un nombre para el bucket (Tiene que ser unico) y luego escribir una contraseña para la base de datos.
 
-- Modificar rutas sin tocar el código.
+Al comenzar, el script va mostrando en pantalla el avance de cada una de las etapas del despliegue. Inicialmente se encarga de verificar y cargar los archivos de la aplicación en el bucket de S3, indicando si el bucket ya existía o si fue creado durante la ejecución.
 
-- Asignar nombre al bucket
+Luego continúa con la creación de los Security Groups correspondientes a la capa web y a la base de datos. Una vez configurada la red, el script procede a desplegar la instancia RDS y mantiene informado al usuario durante el tiempo de espera hasta que quede completamente operativa.
 
-- Nombre y usuario de la instancia RDS
+Con la base de datos disponible, se inicia el aprovisionamiento de la instancia EC2. Tras unos segundos adicionales para permitir la inicialización completa, el script obtiene la dirección IP pública de la instancia.
+Finalmente, se imprime en pantalla la URL de acceso a la aplicación, confirmando que todos los recursos fueron creados y configurados correctamente.
+ 
+Una vez obtenida la URL de la app, se pega en un navegador y se ingresa al login.php. Luego, ingresamos con usuario y contraseña y accedemos a la app.
+Una vez realizado el login, ya tendríamos acceso a la web (En este ejemplo ip 18.209.22.62)
 
-- Activar o desactivar AWS con:
-  HABILITAR_AWS=SI o HABILITAR_AWS=NO.
+![Despliegue de app](ejercicio2/app-desplegada.jpeg)
 
-- No contiene contraseñas por temas de seguridad
 
-Antes de ejecutar con AWS, el usuario debe definir:
-
-export RDS_ADMIN_PASSWORD="ContraseñaDificil123!"
-
-Esta variable es utilizada para crear el usuario administrador del motor MySQL en RDS.
-
-------------------------------------------------------------------------
-
-Uso del script
-
-Modo de uso
-
-Ejecución local (sin AWS)
-
-python3 ejercicio2.py
-
-Esto realiza:
-
-- Creación de directorios
-
-- Creación de empleados.csv
-
-- Creación de deploy.log
-
-- Aplicación de permisos 600 al archivo sensible
-
-Si lo queremos ejecutar con AWS habilitado:
-
-- Editar config_rrhh.env
-
-- HABILITAR_AWS=SI
-
-Exportar la contraseña de RDS:
-
-- export RDS_ADMIN_PASSWORD="ContraseñaDificil123!"
-
-Ejecutar:
-
-python3 ejercicio2.py
-
-El script realizará:
-
-Verificación o creación del bucket S3.
-
-Subida del ZIP de la app.
-
-Subida del archivo empleados.csv.
-
-Creación de una instancia RDS MySQL segura.
-
-----------------------------------------------------------------------------------
-
-Evidencia de ejecución real del script
-
-Ejecución del script en powershell configurado con aws cli
-
-Ejecución con AWS habilitado:
-
-![Ejecución con AWS](Docs/img/ejecucion_powershell_aws.png)
-
-Se observa:
-
-- Confirmación de que el bucket ya existe.
-
-- Subida de app_rrhh.zip.
-
-- Subida de empleados.csv.
-
-- Creación de la instancia RDS rrhh-mysql.
-
-- Mensaje final indicando que el despliegue local fue completado.
-
-Ejecución Local:
-
-En este caso:
-
-- No se realizan acciones en AWS.
-
-- Se crea la estructura local.
-
-- Se indica la cantidad de registros demo creados.
-
-- Se muestra la ubicación del log de despliegue.
-
-![Ejecución sin AWS](Docs/img/ejecucion_powershell_local.png)
-
-Listado de bases de datos en AWS RDS:
-
-![Instancia RDS creada](Docs/img/rds_instancia.png)
-
-se observa la instancia rrhh-mysql en estado Disponible, motor MySQL y clase db.t3.micro.
-
-Detalle de conectividad y seguridad de la instancia RDS:
-
-![Detalle instancia RDS](Docs/img/rds_detalle.png)
-
-Detalle de la instancia: endpoint, puerto, VPC, subredes y grupo de seguridad asociados.
-
-Bucket S3 creado:
-
-![Bucket creado](Docs/img/s3_bucket.png)
-
-Estructura del bucket app/ y data/
-
-El bucket contiene dos carpetas principales:
-
-app/ para el paquete de la aplicación
-data/ para el archivo de empleados
-
-![Estructura del bucket](Docs/img/s3_bucket_estructura.png)
-
-Paquete de la app subido a S3:
-
-Dentro de la carpeta app/ se encuentra el archivo app_rrhh.zip subido por el script
-
-![app_rrhh.zip en S3](Docs/img/s3_app_carpeta.png)
-
-Archivo empleados.csv subido a S3:
-
-Dentro de la carpeta data/ se encuentra el archivo empleados.csv con los datos generados
-
-![empleados.csv en S3](Docs/img/s3_data_carpeta.png)
+ Para corroborar funcionamiento se eliminaron usuarios y también se creo uno nuevo.
 ----------------------------------------------------------------------
 Ubicacion del script en el sistema:
 
