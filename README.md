@@ -139,7 +139,7 @@ A diferencia de otras implementaciones que almacenan credenciales en archivos ex
 
 Además, las credenciales se escriben únicamente dentro del archivo .env en la instancia EC2, el cual se genera con permisos estrictos (600) para impedir su lectura por parte de otros usuarios del sistema.
 ---------------------------------------------------------------------
-Modo de uso y ejemplo de ejecucion
+Ejemplo de ejecucion
 
 Para ejecutar el script hay que ubicarse en el directorio donde se encuentra el archivo del ejercicio y ejecutar en la terminal:
 
