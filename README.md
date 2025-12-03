@@ -1,70 +1,46 @@
-Obligatorio Programación para DevOps 2025
-
-Integrantes: Marco Di Mella (270830), Juan Felipe Scremini (267261)
-
-Carrera: Analista en Infraestructura Informática – Universidad ORT Uruguay
-Año: 2025
-
-Descripción general del proyecto:
-
-Este repositorio contiene la solución completa del Obligatorio de Programación para DevOps 2025, compuesto por:
+Este archivo contiene la solución completa del Obligatorio de Programación para DevOps 2025, compuesto por:
 
 Ejercicio 1 (Bash):
-
 Script que automatiza la creación de usuarios en Linux a partir de un archivo de entrada, aplicando verificaciones, manejo de errores y opciones adicionales de ejecución.
+
+Incluye:
+•	Shell por defecto. 
+•	Directorio home. 
+•	Comentario asociado al usuario. 
+•	Opción para crear el directorio home si no existe. 
+•	Además, incluye opciones para: 
+•	Informar el resultado de la creación de cada usuario. 
+•	Asignar una contraseña común a todos los usuarios. 
 
 Ejercicio 2 (Python + AWS)
 
-Automatización del despliegue de una aplicación de Recursos Humanos, la cual trabaja con datos sensibles (nombres, emails, salarios).
+Automatización del despliegue completo de una aplicación de Recursos Humanos en AWS, asegurando la correcta gestión de datos sensibles.
 
 Incluye:
-
-- Preparación del entorno local
-
-- Creación de carpetas, logs y archivo de empleados
-
-- Protección de datos sensibles
-
-- Subida de artefactos a AWS S3
-
-- Creación de una base de datos MySQL en AWS RDS
-
-- Uso completo de configuraciones externas (config_rrhh.env)
-
-- Trazabilidad mediante GitHub
+•	Preparación del entorno local y archivos de la aplicación.
+•	Subida del contenido web a un bucket S3.
+•	Creación de Security Groups para aislar la capa web y la base de datos.
+•	Aprovisionamiento de una instancia MySQL en AWS RDS con cifrado y backups.
+•	Lanzamiento de una instancia EC2 con instalación automática de Apache y PHP.
+•	Sincronización de archivos desde S3, configuración del archivo .env y carga    opcional del script SQL inicial.
+•	Protección de credenciales mediante inputs y permisos seguros en la instancia.
 
 
 Estructura del repositorio:
 
 ```bash
+
 obligatorio-devops-2025/
 ├── ejercicio1/
 │   ├── Docs/
-│   │   ├── Salida_ejecucion.png 
-│   │   └── salida_ejecucion_ambos_modificadores.png  
+│   │   ├── Salida_ejecucion.png
+│   │   └── salida_ejecucion_ambos_modificadores.png
 │   ├── ej1_crea_usuarios.sh
-│   ├── usuarios.txt
+│   └── usuarios.txt
 │
 ├── ejercicio2/
 │   ├── ejercicio2.py
-│   ├── config_rrhh.env.ejemplo
-│   ├── rrhh_app/
-│   │   ├── datos/
-│   │   │   └── empleados.csv
-│   │   └── logs/
-│   │       └── deploy.log
-│   └── .gitkeep
-│
-├── Docs/
-│   └── img/
-│       ├── ejecucion_powershell_local.png
-│       ├── ejecucion_powershell_aws.png
-│       ├── rds_detalle.png
-│       ├── rds_instancia.png
-│       ├── s3_app_carpeta.png
-│       ├── s3_bucket.png
-│       ├── s3_bucket_estructura.png
-│       └── s3_data_carpeta.png
+│   └── ArchivosWeb/
 │
 ├── .gitignore
 └── README.md
