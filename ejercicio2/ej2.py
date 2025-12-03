@@ -1,20 +1,20 @@
-import boto3                    # SDK de AWS para Python
-import os                       # Manejo de archivos y directorios locales
-import time                     # Pausa para esperar recursos
-from botocore.exceptions import ClientError   # Para manejar errores de AWS
+import boto3                    
+import os                       
+import time                     
+from botocore.exceptions import ClientError  
 
 # ========================
 # Variables globales
 # ========================
 
-BUCKET_NAME = input("Ingrese el nombre del bucket S3: ").strip()   # Nombre del bucket S3
-LOCAL_FOLDER = './ArchivosWeb'                                     # Carpeta local con archivos de la app
-S3_PREFIX = 'appweb/'                                              # Prefijo dentro del bucket
-DB_INSTANCE_ID = 'rrhh-rds-instancia'  # Nombre de la instancia RDS
-DB_USERNAME = 'admin'                                              # Usuario administrador de la DB
-DB_NAME = 'demo_db'                                                # Nombre de la base
+BUCKET_NAME = input("Ingrese el nombre del bucket S3: ").strip()  
+LOCAL_FOLDER = './ArchivosWeb'                                     
+S3_PREFIX = 'appweb/'                                              
+DB_INSTANCE_ID = 'rrhh-rds-instancia'  
+DB_USERNAME = 'admin'                                              
+DB_NAME = 'demo_db'                                                
 DB_PASSWORD = input("Ingrese la contraseña para la base de datos (mínimo 8 caracteres): ").strip()
-EC2_IMAGE_ID = 'ami-0fa3fe0fa7920f68e'                             # AMI a utilizar
+EC2_IMAGE_ID = 'ami-0fa3fe0fa7920f68e'                            
 
 # Clientes de AWS
 ec2_client = boto3.client('ec2')
@@ -135,7 +135,7 @@ def create_rds_instance(db_sg_id):
             StorageEncrypted=True,               # Cifrado en reposo
             VpcSecurityGroupIds=[db_sg_id],      # SG asociado
             BackupRetentionPeriod=7,             # Backups automáticos
-            PubliclyAccessible=True              # En el lab, esto puede ser True
+            PubliclyAccessible=True              
         )
         print("Instancia RDS creada: esperando a que esté disponible...")
 
