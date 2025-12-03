@@ -88,8 +88,6 @@ ejemplo:
 usuario:comentario:home:SI|NO:shell
 ```
 
-
-
 ------------------------------------------------------------------------
 
 El script utiliza códigos de salida específicos para identificar fallas:
@@ -108,19 +106,76 @@ El script utiliza códigos de salida específicos para identificar fallas:
 
 ------------------------------------------------------------------------
 
+------------------------------------------------------------------------
+
 
 Requisitos / Dependencias
 
 Para que el script pueda ejecutarse sin problemas, es necesario contar con un entorno previamente configurado tanto a nivel local como en la plataforma de AWS.
-En el equipo donde se ejecute el programa se debe disponer de Python 3 y de las librerías necesarias para interactuar con los servicios de la nube. En particular, se utilizan los módulos boto3 y botocore, que permiten crear, administrar y consultar recursos de AWS directamente desde el código. Ambos paquetes pueden instalarse mediante:
-
-pip install boto3 botocore
+En el equipo donde se ejecute el programa se debe disponer de Python y de las librerías necesarias para interactuar con los servicios de la nube. En particular, se utilizan los módulos boto3 y botocore, que permiten crear, administrar y consultar recursos de AWS directamente desde el código. 
 
 Además del entorno de Python, se requiere que la AWS CLI esté instalada y correctamente configurada con un usuario que cuente con permisos suficientes para aprovisionar infraestructura. Las credenciales asociadas deben habilitar acciones sobre los servicios utilizados en el despliegue, tales como Amazon S3, EC2 y RDS. Sin estas políticas, el script no podrá crear ni modificar los recursos necesarios.
 
 También es indispensable contar con la carpeta local que contiene los archivos de la aplicación web, la cual el script sincroniza automáticamente hacia el bucket de S3. Dichos archivos deben ubicarse dentro del directorio ArchivosWeb, manteniendo la estructura prevista para que el servidor web pueda procesarlos correctamente.
 
 En conjunto, estas dependencias, tanto de software como de configuración en AWS garantizan que el script pueda ejecutar todas las etapas del despliegue de forma segura, automatizada y sin errores.
+
+Detalle:
+
+El script utiliza boto3 para interactuar con los servicios de AWS.
+Instalar dependencias con:
+
+```bash
+pip install boto3 botocore
+```
+Si usás un entorno virtual:
+```bash
+python3 -m venv venv
+source venv/bin/activate      # Linux
+.\venv\Scripts\activate       # Windows (para pruebas)
+```
+Se recomienda el uso de un entorno virtual (venv) para evitar confilctos con otras aplicaciones
+
+Instalar AWS CLI en Windows:
+
+Descargar el archivo desde:
+
+https://awscli.amazonaws.com/AWSCLIV2.msi
+
+ejecutar el instalador e instalarlo por defecto
+
+Instalar en Linux / WSL:
+
+Descargar el paquete:
+```bash
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+```
+Descomprimir el paquete:
+```bash
+unzip awscliv2.zip
+```
+
+Instalar AWS CLI
+```bash
+sudo ./aws/install
+```
+Una vez instalado, hay que configurar las credenciales de AWS con:
+```bash
+aws configure
+```
+En el Lab de AWS hay que ir a "Aws Details" e ir copiando las claves a medida que las pida.
+También hay que configurar la región, en este caso us-east-1. Por ulitmo elegimos el formato json.
+
+El script requiere una carpeta llamada:
+
+ArchivosWeb
+
+Esta carpeta debe contener los archivos de la aplicación web que se copiarán a S3 y luego a la instancia EC2.
+
+Finalmente, hay que dar permisos de ejecucion al script
+```bash
+chmod +x ej2.py
+```
 
 ------------------------------------------------------------------------
 Funcionalidad y medidas de seguridad
