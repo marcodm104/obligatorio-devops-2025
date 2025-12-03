@@ -108,6 +108,7 @@ El script utiliza códigos de salida específicos para identificar fallas:
 
 ------------------------------------------------------------------------
 
+Ejercicio 2
 
 Requisitos / Dependencias
 
@@ -178,7 +179,7 @@ chmod +x ej2.py
 ```
 
 ------------------------------------------------------------------------
-Funcionalidad y medidas de seguridad
+Funcionamiento y Seguridad
 
 El script desarrollado en Python tiene como finalidad automatizar todo el proceso de despliegue de la aplicación de Recursos Humanos dentro de la infraestructura de AWS. Para lograrlo, se emplea la librería boto3, que permite crear y configurar servicios en la nube siguiendo principios de Infraestructura como Código, garantizando un despliegue repetible, ordenado y seguro.
 

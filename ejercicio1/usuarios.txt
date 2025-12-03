@@ -1,2 +1,8 @@
-pepe:usuario de prueba:/home/pepe:SI:/bin/bash
-juan:cuenta común:/home/juan:NO:/bin/bash
+pepe:Este es mi amigo pepe:/home/jose:SI:/bin/bash
+papanatas:Este es un usuario trucho:/trucho:NO:/bin/sh
+elmaligno::::/bin/el_maligno
+
+ana:Usuario administrativa:/home/ana:SI:/bin/bash
+tomas::/home/tomas:NO:/bin/zsh
+valeria:Empleado temporal::SI:/bin/bash
+bot::/bots/agent:NO:
