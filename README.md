@@ -4,26 +4,26 @@ Ejercicio 1 (Bash):
 Script que automatiza la creación de usuarios en Linux a partir de un archivo de entrada, aplicando verificaciones, manejo de errores y opciones adicionales de ejecución.
 
 Incluye:
-•	Shell por defecto. 
-•	Directorio home. 
-•	Comentario asociado al usuario. 
-•	Opción para crear el directorio home si no existe. 
-•	Además, incluye opciones para: 
-•	Informar el resultado de la creación de cada usuario. 
-•	Asignar una contraseña común a todos los usuarios. 
+-	Shell por defecto. 
+-	Directorio home. 
+-	Comentario asociado al usuario. 
+-	Opción para crear el directorio home si no existe. 
+-	Además, incluye opciones para: 
+-	Informar el resultado de la creación de cada usuario. 
+-	Asignar una contraseña común a todos los usuarios. 
 
 Ejercicio 2 (Python + AWS)
 
 Automatización del despliegue completo de una aplicación de Recursos Humanos en AWS, asegurando la correcta gestión de datos sensibles.
 
 Incluye:
-•	Preparación del entorno local y archivos de la aplicación.
-•	Subida del contenido web a un bucket S3.
-•	Creación de Security Groups para aislar la capa web y la base de datos.
-•	Aprovisionamiento de una instancia MySQL en AWS RDS con cifrado y backups.
-•	Lanzamiento de una instancia EC2 con instalación automática de Apache y PHP.
-•	Sincronización de archivos desde S3, configuración del archivo .env y carga    opcional del script SQL inicial.
-•	Protección de credenciales mediante inputs y permisos seguros en la instancia.
+-	Preparación del entorno local y archivos de la aplicación.
+-	Subida del contenido web a un bucket S3.
+-	Creación de Security Groups para aislar la capa web y la base de datos.
+-	Aprovisionamiento de una instancia MySQL en AWS RDS con cifrado y backups.
+-	Lanzamiento de una instancia EC2 con instalación automática de Apache y PHP.
+-	Sincronización de archivos desde S3, configuración del archivo .env y carga    opcional del script SQL inicial.
+-	Protección de credenciales mediante inputs y permisos seguros en la instancia.
 
 
 Estructura del repositorio:
@@ -660,18 +660,3 @@ if __name__ == "__main__":
 ```
 ----------------------------------------------------------------------
 
-El script desarrollado cumple con todos los requisitos:
-
-Automatiza el despliegue de una aplicación.
-
-Maneja datos sensibles de forma segura.
-
-Utiliza variables de entorno para credenciales.
-
-Evita exposición de claves en el repositorio.
-
-Lee configuración 100% desde archivo externo.
-
-Puede operar en modo local o modo AWS.
-
-Es totalmente trazable mediante GitHub (commits, ramas, documentación).
