@@ -333,6 +333,22 @@ También es indispensable contar con la carpeta local que contiene los archivos 
 
 En conjunto, estas dependencias, tanto de software como de configuración en AWS garantizan que el script pueda ejecutar todas las etapas del despliegue de forma segura, automatizada y sin errores.
 
+------------------------------------------------------------------------
+Funcionalidad y medidas de seguridad
+
+El script desarrollado en Python tiene como finalidad automatizar todo el proceso de despliegue de la aplicación de Recursos Humanos dentro de la infraestructura de AWS. Para lograrlo, se emplea la librería boto3, que permite crear y configurar servicios en la nube siguiendo principios de Infraestructura como Código, garantizando un despliegue repetible, ordenado y seguro.
+
+El proceso comienza con la preparación del contenido web: el script verifica la existencia de la carpeta local de la aplicación y carga todos los archivos necesarios en un bucket de Amazon S3. Esto permite que la instancia EC2, que se aprovisionará más adelante, pueda descargar y ejecutar la aplicación sin intervención manual.
+
+Luego, el script crea los grupos de seguridad que definen el flujo de tráfico dentro del entorno. Por un lado, se configura un Security Group para la capa web, permitiendo únicamente tráfico HTTP desde cualquier origen. Por otro, se genera un Security Group específico para la base de datos, el cual restringe completamente las conexiones externas y solo admite solicitudes provenientes del servidor web. Esta separación entre capas reduce significativamente la superficie de ataque y asegura un aislamiento adecuado entre servicios.
+
+A continuación, se provisiona una base de datos MySQL mediante Amazon RDS. La instancia es creada con almacenamiento cifrado, backups automáticos habilitados y parámetros que refuerzan la seguridad, cumpliendo con los requisitos de protección de datos sensibles. El endpoint de la base de datos se obtiene dinámicamente una vez que el servicio está disponible, lo que permite integrarlo automáticamente con la instancia EC2.
+
+Durante el lanzamiento de la instancia EC2, el script genera un User Data personalizado que se ejecuta al iniciar el servidor. Este User Data instala Apache, PHP y los complementos requeridos, descarga los archivos de la aplicación desde S3, configura los permisos adecuados, genera el archivo .env con las credenciales necesarias y ejecuta el script SQL init_db.sql si está presente. Todo este proceso asegura que la aplicación quede completamente funcional al terminar el aprovisionamiento.
+
+A diferencia de otras implementaciones que almacenan credenciales en archivos externos, este script solicita la contraseña directamente al usuario mediante un input interactivo, evitando que quede en el repositorio o en el sistema de archivos. Esto reduce el riesgo de exposición accidental y elimina la necesidad de manejar archivos sensibles.
+
+Además, las credenciales se escriben únicamente dentro del archivo .env en la instancia EC2, el cual se genera con permisos estrictos (600) para impedir su lectura por parte de otros usuarios del sistema.
 ----------------------------------------------------------------------
 Modo de uso y ejemplo de ejecucion
 
@@ -356,8 +372,8 @@ Una vez realizado el login, ya tendríamos acceso a la web (En este ejemplo ip 1
 
 ![Despliegue de app](ejercicio2/app-desplegada.jpeg)
 
-
- Para corroborar funcionamiento se eliminaron usuarios y también se creo uno nuevo.
+Para corroborar el funcionamiento se eliminaron usuarios y se creó uno nuevo.
+ 
 ----------------------------------------------------------------------
 Ubicacion del script en el sistema:
 
@@ -367,293 +383,280 @@ C:\Users\Marco Aurelio\Documents\devops\obligatorio-devops-2025\ejercicio2
 ```python
 Codigo ejercicio 2
 
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+import boto3                    
+import os                       
+import time                     
+from botocore.exceptions import ClientError  
 
-import os
-from datetime import datetime
+# ========================
+# Variables globales
+# ========================
 
-import boto3
-from botocore.exceptions import ClientError
+BUCKET_NAME = input("Ingrese el nombre del bucket S3: ").strip()  
+LOCAL_FOLDER = './ArchivosWeb'                                     
+S3_PREFIX = 'appweb/'                                              
+DB_INSTANCE_ID = 'rrhh-rds-instancia'  
+DB_USERNAME = 'admin'                                              
+DB_NAME = 'demo_db'                                                
+DB_PASSWORD = input("Ingrese la contraseña para la base de datos (mínimo 8 caracteres): ").strip()
+EC2_IMAGE_ID = 'ami-0fa3fe0fa7920f68e'                            
 
-# ------------------ Funciones auxiliares locales ------------------ #
-
-def leer_config(ruta_config):
-    """
-    Lee un archivo de configuración tipo CLAVE=valor
-    y devuelve un diccionario.
-    Ignora líneas vacías y comentarios que empiezan con #.
-    """
-    config = {}
-    with open(ruta_config, "r", encoding="utf-8") as f:
-        for linea in f:
-            linea = linea.strip()
-            if not linea or linea.startswith("#"):
-                continue
-            partes = linea.split("=", 1)
-            if len(partes) != 2:
-                continue
-            clave = partes[0].strip()
-            valor = partes[1].strip()
-            config[clave] = valor
-    return config
+# Clientes de AWS
+ec2_client = boto3.client('ec2')
+rds_client = boto3.client('rds')
+s3_client = boto3.client('s3')
 
 
-def asegurar_directorio(ruta_dir):
-    """
-    Crea el directorio si no existe.
-    """
-    if not os.path.exists(ruta_dir):
-        os.makedirs(ruta_dir)
+# =======================================
+# Subir archivos al bucket S3
+# =======================================
+def upload_web_files():
+    print("\nSubiendo archivos web al bucket S3...")
 
-
-def registrar_log(ruta_log, mensaje):
-    """
-    Agrega una línea al archivo de log con fecha y hora.
-    """
-    marca_tiempo = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    linea = f"[{marca_tiempo}] {mensaje}\n"
-    with open(ruta_log, "a", encoding="utf-8") as f:
-        f.write(linea)
-
-
-def crear_archivo_empleados(ruta_empleados, modo_demo):
-    """
-    Crea el archivo empleados.csv si no existe.
-    Si modo_demo == 'SI', crea datos de prueba.
-    Si modo_demo == 'NO', solo crea el encabezado.
-    Devuelve la cantidad de registros creados (no cuenta el encabezado).
-    """
-    if os.path.exists(ruta_empleados):
-        # ya existe, no se pisa para no romper datos reales
-        return 0
-
-    encabezado = "nombre,email,salario\n"
-    datos_demo = [
-        "Alicia,a@ejemplo.com,50000\n",
-        "Bruno,b@ejemplo.com,60000\n",
-        "Carla,c@ejemplo.com,70000\n",
-    ]
-
-    with open(ruta_empleados, "w", encoding="utf-8") as f:
-        f.write(encabezado)
-        if modo_demo.upper() == "SI":
-            for linea in datos_demo:
-                f.write(linea)
-            cantidad = len(datos_demo)
-        else:
-            cantidad = 0
-
-    return cantidad
-
-
-def proteger_archivo_sensible(ruta):
-    """
-    Intenta poner permisos 600 (rw-------) al archivo.
-    Si falla por permisos, no corta el programa.
-    """
-    try:
-        os.chmod(ruta, 0o600)
-    except PermissionError:
-        # no tenemos permisos suficientes, lo dejamos pasar
-        pass
-
-# ------------------ Funciones AWS (S3 y RDS) ------------------ #
-
-def asegurar_bucket_y_subir(aws_region, bucket_name,
-                             app_package_path, s3_app_key,
-                             empleados_path, s3_empleados_key,
-                             ruta_log):
-    """
-    Crea (si hace falta) el bucket S3 y sube:
-    - paquete de la app
-    - archivo de empleados
-    """
-    s3 = boto3.client("s3", region_name=aws_region if aws_region else None)
-
-    # Verificar/crear bucket
-    try:
-        s3.head_bucket(Bucket=bucket_name)
-        print(f"El bucket '{bucket_name}' ya existe.")
-        registrar_log(ruta_log, f"Bucket S3 {bucket_name} ya existía.")
-    except ClientError:
-        # intentar crearlo
-        try:
-            s3.create_bucket(Bucket=bucket_name)
-            print(f"Bucket creado: {bucket_name}")
-            registrar_log(ruta_log, f"Bucket S3 {bucket_name} creado.")
-        except ClientError as e:
-            print(f"Error creando bucket: {e}")
-            registrar_log(ruta_log, f"ERROR creando bucket {bucket_name}: {e}")
-            raise
-
-    # Subir paquete de aplicación
-    if not os.path.exists(app_package_path):
-        raise FileNotFoundError(f"El paquete de la app no existe: {app_package_path}")
+    # Verifica que la carpeta exista
+    if not os.path.isdir(LOCAL_FOLDER):
+        print(f"La carpeta NO existe: {LOCAL_FOLDER}")
+        exit(1)
 
     try:
-        s3.upload_file(app_package_path, bucket_name, s3_app_key)
-        print(f"Paquete app subido a s3://{bucket_name}/{s3_app_key}")
-        registrar_log(ruta_log, f"Subido paquete app a s3://{bucket_name}/{s3_app_key}")
-    except ClientError as e:
-        print(f"Error subiendo paquete de la app: {e}")
-        registrar_log(ruta_log, f"ERROR subiendo paquete app: {e}")
-        raise
-
-    # Subir archivo de empleados (datos sensibles)
-    if not os.path.exists(empleados_path):
-        raise FileNotFoundError(f"El archivo de empleados no existe: {empleados_path}")
-
-    try:
-        s3.upload_file(empleados_path, bucket_name, s3_empleados_key)
-        print(f"Archivo de empleados subido a s3://{bucket_name}/{s3_empleados_key}")
-        registrar_log(ruta_log, f"Subido empleados a s3://{bucket_name}/{s3_empleados_key}")
-    except ClientError as e:
-        print(f"Error subiendo archivo de empleados: {e}")
-        registrar_log(ruta_log, f"ERROR subiendo empleados: {e}")
-        raise
-
-
-def asegurar_instancia_rds(aws_region, instancia_id, db_name, db_user, ruta_log):
-    """
-    Crea la instancia RDS MySQL si no existe.
-    La contraseña del admin se toma de la variable de entorno RDS_ADMIN_PASSWORD.
-    """
-    db_pass = os.environ.get("RDS_ADMIN_PASSWORD")
-    if not db_pass:
-        raise Exception(
-            "Debe definirse la variable de entorno RDS_ADMIN_PASSWORD con la contraseña del admin."
-        )
-
-    rds = boto3.client("rds", region_name=aws_region if aws_region else None)
-
-    # ¿Ya existe la instancia?
-    try:
-        rds.describe_db_instances(DBInstanceIdentifier=instancia_id)
-        print(f"La instancia RDS '{instancia_id}' ya existe.")
-        registrar_log(ruta_log, f"Instancia RDS {instancia_id} ya existente.")
-        return
-    except rds.exceptions.DBInstanceNotFoundFault:
-        print(f"La instancia RDS '{instancia_id}' no existe. Creándola...")
-        registrar_log(ruta_log, f"Creando instancia RDS {instancia_id}...")
-
-    try:
-        rds.create_db_instance(
-            DBInstanceIdentifier=instancia_id,
-            AllocatedStorage=20,
-            DBInstanceClass="db.t3.micro",
-            Engine="mysql",
-            MasterUsername=db_user,
-            MasterUserPassword=db_pass,
-            DBName=db_name,
-            PubliclyAccessible=False,  # más seguro
-            BackupRetentionPeriod=0,
-        )
-        print(f"Instancia RDS {instancia_id} creada correctamente.")
-        registrar_log(ruta_log, f"Instancia RDS {instancia_id} creada correctamente.")
-    except rds.exceptions.DBInstanceAlreadyExistsFault:
-        print(f"La instancia {instancia_id} ya existe.")
-        registrar_log(ruta_log, f"Instancia RDS {instancia_id} ya existía (create_db_instance).")
+        # Intenta crear el bucket
+        s3_client.create_bucket(Bucket=BUCKET_NAME)
+        print(f"Bucket creado correctamente: {BUCKET_NAME}")
     except Exception as e:
-        print(f"Error creando la instancia RDS: {e}")
-        registrar_log(ruta_log, f"ERROR creando RDS {instancia_id}: {e}")
-        raise
-    
-# ------------------ Función principal ------------------ #
+        # Si ya existe y es del usuario, se reutiliza
+        if "BucketAlreadyOwnedByYou" in str(e):
+            print("ℹ El bucket ya existe y es de su propiedad.")
 
-def main():
-    # 1) Leer configuración
-    ruta_config = "config_rrhh.env"
-    config = leer_config(ruta_config)
+    # Recorre recursivamente todos los archivos dentro de LOCAL_FOLDER
+    for root, dirs, files in os.walk(LOCAL_FOLDER):
+        for filename in files:
+            local_path = os.path.join(root, filename)    # Ruta completa local
+            # Ruta relativa respecto a LOCAL_FOLDER (para mantener estructura)
+            s3_key = os.path.relpath(local_path, LOCAL_FOLDER).replace("\\", "/")
+            # Ruta final en S3: appweb/<ruta_relativa>
+            s3_path = f"{S3_PREFIX}{s3_key}"
 
-    # Config local
-    base_dir = config.get("BASE_DIR", "./rrhh_app")
-    datos_dir_nombre = config.get("DATOS_DIR", "datos")
-    logs_dir_nombre = config.get("LOGS_DIR", "logs")
-    nombre_empleados = config.get("ARCHIVO_EMPLEADOS", "empleados.csv")
-    nombre_log = config.get("ARCHIVO_LOG", "deploy.log")
-    modo_demo = config.get("MODO_DEMO", "SI")
+            print(f"Subiendo: {local_path} -> s3://{BUCKET_NAME}/{s3_path}")
+            s3_client.upload_file(local_path, BUCKET_NAME, s3_path)  # Subir archivo
 
-    # Config AWS
-    habilitar_aws = config.get("HABILITAR_AWS", "NO").upper() == "SI"
-    aws_region = config.get("AWS_REGION", "")
-    s3_bucket = config.get("S3_BUCKET", "")
-    app_package = config.get("APP_PACKAGE", "app_rrhh.zip")
-    s3_app_key = config.get("S3_APP_KEY", "app/app_rrhh.zip")
-    s3_empleados_key = config.get("S3_EMPLEADOS_KEY", "data/empleados.csv")
-    rds_instancia_id = config.get("RDS_DB_INSTANCE_ID", "rrhh-mysql")
-    rds_db_name = config.get("RDS_DB_NAME", "rrhh")
-    rds_db_user = config.get("RDS_DB_USER", "admin")
+    print("Archivos web subidos exitosamente al bucket S3.\n")
 
-    # 2) Construir rutas locales
-    datos_dir = os.path.join(base_dir, datos_dir_nombre)
-    logs_dir = os.path.join(base_dir, logs_dir_nombre)
-    ruta_empleados = os.path.join(datos_dir, nombre_empleados)
-    ruta_log = os.path.join(logs_dir, nombre_log)
 
-    # 3) Crear estructura de directorios
-    asegurar_directorio(base_dir)
-    asegurar_directorio(datos_dir)
-    asegurar_directorio(logs_dir)
+# ===============================================================
+# Crear un Security Group (SG) con reglas de ingreso especificadas
+# ===============================================================
+def create_security_group(group_name, description, ingress_rules):
+    group_id = None
+    try:
+        response = ec2_client.create_security_group(
+            GroupName=group_name,
+            Description=description
+        )
+        group_id = response['GroupId']                   # ID del SG creado
 
-    # 4) Registrar inicio en log
-    registrar_log(ruta_log, "Inicio de despliegue de aplicación RRHH (local + AWS opcional).")
+        ec2_client.authorize_security_group_ingress(     # Agregar reglas
+            GroupId=group_id,
+            IpPermissions=ingress_rules
+        )
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'InvalidGroup.Duplicate':
+            # Si el SG ya existe, recuperamos su ID
+            existing = ec2_client.describe_security_groups(GroupNames=[group_name])
+            group_id = existing['SecurityGroups'][0]['GroupId']
+    return group_id
 
-    # 5) Crear archivo de empleados (demo o vacío)
-    cant_registros = crear_archivo_empleados(ruta_empleados, modo_demo)
-    registrar_log(
-        ruta_log,
-        f"Archivo de empleados: {ruta_empleados}. Registros creados (demo): {cant_registros}"
+
+# ===============================================================
+# Configurar los SG para Web y Base de Datos
+# ===============================================================
+def setup_security_groups():
+    # SG para el servidor web
+    web_sg_name = 'rrhh-web-sg'
+    web_sg_id = create_security_group(
+        web_sg_name,
+        'Grupo de seguridad para el servidor web RRHH',
+        [
+            {
+                'IpProtocol': 'tcp',                     # Protocolo HTTP
+                'FromPort': 80,
+                'ToPort': 80,
+                'IpRanges': [{'CidrIp': '0.0.0.0/0'}]    # Acceso público
+            }
+        ]
     )
 
-    # 6) Proteger archivo sensible
-    proteger_archivo_sensible(ruta_empleados)
-    registrar_log(ruta_log, f"Permisos 600 aplicados (si fue posible) sobre {ruta_empleados}")
+    # SG para RDS que solo permite tráfico desde el SG Web
+    db_sg_name = 'rrhh-db-sg'
+    db_sg_id = create_security_group(
+        db_sg_name,
+        'Grupo de seguridad para la base de datos RRHH',
+        [
+            {
+                'IpProtocol': 'tcp',
+                'FromPort': 3306,
+                'ToPort': 3306,
+                'UserIdGroupPairs': [{'GroupId': web_sg_id}]   # Solo EC2 Web accede
+            }
+        ]
+    )
 
-    # 7) Parte AWS
-    if habilitar_aws:
-        print("Se habilitó despliegue en AWS según configuración.")
-        registrar_log(ruta_log, "Despliegue AWS habilitado.")
+    return web_sg_id, db_sg_id
 
-        try:
-            asegurar_bucket_y_subir(
-                aws_region=aws_region,
-                bucket_name=s3_bucket,
-                app_package_path=app_package,
-                s3_app_key=s3_app_key,
-                empleados_path=ruta_empleados,
-                s3_empleados_key=s3_empleados_key,
-                ruta_log=ruta_log,
-            )
-            asegurar_instancia_rds(
-                aws_region=aws_region,
-                instancia_id=rds_instancia_id,
-                db_name=rds_db_name,
-                db_user=rds_db_user,
-                ruta_log=ruta_log,
-            )
-        except Exception as e:
-            print(f"Error durante la parte AWS del despliegue: {e}")
-            registrar_log(ruta_log, f"ERROR en despliegue AWS: {e}")
+
+# ===============================================================
+# Crear instancia RDS MySQL
+# ===============================================================
+def create_rds_instance(db_sg_id):
+    try:
+        rds_client.create_db_instance(
+            DBInstanceIdentifier=DB_INSTANCE_ID,
+            DBInstanceClass='db.t3.micro',
+            Engine='mysql',
+            MasterUsername=DB_USERNAME,
+            MasterUserPassword=DB_PASSWORD,
+            DBName=DB_NAME,
+            AllocatedStorage=20,
+            StorageType='gp2',
+            StorageEncrypted=True,               # Cifrado en reposo
+            VpcSecurityGroupIds=[db_sg_id],      # SG asociado
+            BackupRetentionPeriod=7,             # Backups automáticos
+            PubliclyAccessible=True              
+        )
+        print("Instancia RDS creada: esperando a que esté disponible...")
+
+        waiter = rds_client.get_waiter('db_instance_available')  # Espera hasta que RDS esté lista
+        waiter.wait(DBInstanceIdentifier=DB_INSTANCE_ID)
+
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'DBInstanceAlreadyExists':
+            print(f"ℹ La instancia RDS ya existe: {DB_INSTANCE_ID}")
         else:
-            registrar_log(ruta_log, "Despliegue AWS completado correctamente.")
-    else:
-        registrar_log(ruta_log, "Despliegue AWS deshabilitado por configuración.")
+            print("Error creando la instancia RDS:", e)
+            raise
 
-    # 8) Mensaje final al usuario (sin mostrar salarios)
-    print("Despliegue de aplicación RRHH completado (local).")
-    print(f"Directorio base: {os.path.abspath(base_dir)}")
-    print(f"Archivo de empleados: {os.path.abspath(ruta_empleados)}")
-    print(f"Cantidad de registros cargados (demo): {cant_registros}")
-    print(f"Log de despliegue: {os.path.abspath(ruta_log)}")
-    print("IMPORTANTE: los salarios y datos sensibles NO se muestran por pantalla.")
+    info = rds_client.describe_db_instances(DBInstanceIdentifier=DB_INSTANCE_ID)
+    return info['DBInstances'][0]['Endpoint']['Address']   # Retorna el endpoint
 
-    registrar_log(ruta_log, "Despliegue local completado correctamente.")
-    return 0
+
+# ===============================================================
+# Generar script User Data para inicializar EC2
+# ===============================================================
+def generate_userdata_script(db_endpoint):
+    # Este script se ejecuta automáticamente cuando EC2 inicia.
+    return f'''#!/bin/bash
+yum update -y
+yum install -y httpd php php-cli php-fpm php-common php-mysqlnd mariadb105 awscli
+
+systemctl enable --now httpd
+systemctl enable --now php-fpm
+
+# Configurar PHP-FPM con Apache
+echo '<FilesMatch \\\\.php$>
+  SetHandler "proxy:unix:/run/php-fpm/www.sock|fcgi://localhost/"
+</FilesMatch>' | tee /etc/httpd/conf.d/php-fpm.conf
+
+rm -rf /var/www/html/*
+
+# Sincroniza desde appweb/ (coincide con S3_PREFIX)
+aws s3 sync s3://{BUCKET_NAME}/appweb/ /var/www/html/
+
+# Copiar SQL inicial si existe
+if [ -f /var/www/html/init_db.sql ]; then
+  cp /var/www/html/init_db.sql /var/www/
+fi
+
+# Crear archivo .env con credenciales
+if [ ! -f /var/www/.env ]; then
+cat > /var/www/.env << 'EOT'
+DB_HOST={db_endpoint}
+DB_NAME={DB_NAME}
+DB_USER={DB_USERNAME}
+DB_PASS={DB_PASSWORD}
+EOT
+fi
+
+chown apache:apache /var/www/.env
+chmod 600 /var/www/.env
+
+chown -R apache:apache /var/www/html
+chmod -R 755 /var/www/html
+
+# Ejecutar script SQL inicial si está presente
+if [ -f /var/www/init_db.sql ]; then
+  mysql -h {db_endpoint} -u {DB_USERNAME} -p{DB_PASSWORD} {DB_NAME} < /var/www/init_db.sql
+fi
+
+systemctl restart httpd php-fpm
+'''
+
+
+# ===============================================================
+# Lanzar instancia EC2
+# ===============================================================
+def launch_ec2_instance(web_sg_id, userdata_script):
+    response = ec2_client.run_instances(
+        ImageId=EC2_IMAGE_ID,
+        InstanceType='t2.micro',
+        MinCount=1,
+        MaxCount=1,
+        IamInstanceProfile={'Name': 'LabInstanceProfile'},
+        SecurityGroupIds=[web_sg_id],
+        UserData=userdata_script,
+        BlockDeviceMappings=[
+            {
+                'DeviceName': '/dev/xvda',
+                'Ebs': {
+                    'VolumeSize': 8,
+                    'VolumeType': 'gp2',
+                    'Encrypted': True
+                }
+            }
+        ]
+    )
+
+    instance_id = response['Instances'][0]['InstanceId']
+
+    # Etiquetas
+    ec2_client.create_tags(
+        Resources=[instance_id],
+        Tags=[
+            {'Key': 'Name', 'Value': 'app-rrhh'},
+            {'Key': 'Application', 'Value': 'RRHH'},
+            {'Key': 'DataClassification', 'Value': 'Confidencial'}
+        ]
+    )
+
+    return instance_id
+
+
+# ===============================================================
+# Obtener IP pública de una EC2
+# ===============================================================
+def get_instance_public_ip(instance_id):
+    print("\nObteniendo la dirección IP pública de la instancia EC2...")
+    time.sleep(15)  # Espera básica para que la IP se asigne y los servicios levanten
+    info = ec2_client.describe_instances(InstanceIds=[instance_id])
+    return info['Reservations'][0]['Instances'][0].get('PublicIpAddress')
+
+
+# ===============================================================
+# Función principal
+# ===============================================================
+def main():
+    upload_web_files()                               # Subir app a S3
+    web_sg_id, db_sg_id = setup_security_groups()    # Crear SGs
+    db_endpoint = create_rds_instance(db_sg_id)      # Crear RDS y obtener endpoint
+    userdata = generate_userdata_script(db_endpoint) # Generar User Data
+    instance_id = launch_ec2_instance(web_sg_id, userdata)  # Lanzar EC2
+    public_ip = get_instance_public_ip(instance_id)  # Obtener IP pública
+
+    print(f"\nURL de acceso a la aplicación web: http://{public_ip}/login.php")
+    print("====================================")
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()
+
 ```
 ----------------------------------------------------------------------
 
